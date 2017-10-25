@@ -1,0 +1,211 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Egret</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="full-screen" content="true"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <meta name="x5-fullscreen" content="true"/>
+    <meta name="360-fullscreen" content="true"/>
+    <style>
+        html, body {
+            -ms-touch-action: none;
+            background: #888888;
+            padding: 0;
+            border: 0;
+            margin: 0;
+            height: 100%;
+        }
+        .inputList{
+           position: absolute;
+           left: 0;
+           top: 0; 
+        }
+        .inputList>div{
+            display: inline;
+        }
+        .show{
+            display: block;
+        }
+        .hide{
+            display: none;
+        }
+        .upload {
+            padding: 4px 10px;
+            height: 20px;
+            line-height: 20px;
+            position: relative;
+            cursor: pointer;
+            color: #888;
+            background: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            display: inline-block;
+            *display: inline;
+            *zoom: 1;
+            text-decoration: none;
+        }
+        .upload  input {
+            position: absolute;
+            font-size: 100px;
+            right: 0;
+            top: 0;
+            opacity: 0;
+            filter: alpha(opacity=0);
+            cursor: pointer
+        }
+
+        .upload:hover {
+            color: #444;
+            background: #eee;
+            border-color: #ccc;
+            text-decoration: none
+        }
+    </style>
+
+    <!--这个标签为通过egret提供的第三方库的方式生成的 javascript 文件。删除 modules_files 标签后，库文件加载列表将不会变化，请谨慎操作！-->
+    <!--modules_files_start-->
+	<script egret="lib" src="libs/modules/egret/egret.min.js"></script>
+	<script egret="lib" src="libs/modules/egret/egret.web.min.js"></script>
+	<script egret="lib" src="libs/modules/game/game.min.js"></script>
+	<script egret="lib" src="libs/modules/res/res.min.js"></script>
+	<script egret="lib" src="libs/modules/eui/eui.min.js"></script>
+	<script egret="lib" src="libs/modules/experimental/experimental.min.js"></script>
+	<script egret="lib" src="libs/modules/tween/tween.min.js"></script>
+	<script egret="lib" src="libs/modules/socket/socket.min.js"></script>
+	<!--modules_files_end-->
+
+    <!--这个标签为不通过egret提供的第三方库的方式使用的 javascript 文件，请将这些文件放在libs下，但不要放在modules下面。-->
+    <!--other_libs_files_start-->
+    <script egret="lib" src="polyfill/promise.min.js"></script>
+    <!--other_libs_files_end-->
+
+    <!--这个标签会被替换为项目中所有的 javascript 文件。删除 game_files 标签后，项目文件加载列表将不会变化，请谨慎操作！-->
+    <!--game_files_start-->
+	<script src="main.min.js"></script>
+	<!--game_files_end-->
+</head>
+<body>
+    <script src="src/js/Blob.js"></script>
+    <script src="src/js/FileSaver.js"></script>
+    <div style="margin: auto;width: 100%;height: 100%;" class="egret-player"
+         data-entry-class="Main"
+         data-orientation="auto"
+         data-scale-mode="showAll"
+         data-frame-rate="30"
+         data-content-width="480"
+         data-content-height="800"
+         data-show-paint-rect="false"
+         data-multi-fingered="2"
+         data-show-fps="false" data-show-log="false"
+         data-show-fps-style="x:0,y:0,size:12,textColor:0xffffff,bgAlpha:0.9">
+    </div>
+    <div class="inputList">
+        <div>
+            <a href="javascript:;" class="upload">
+                <input type="file" onchange="getMovie(this)"></input>
+                选择技能模型
+            </a>
+        </div>
+        <div>
+            <a href="javascript:;" class="upload">
+                <input type="file" onchange="getRoleMovie(this)" ></input>
+                选择人物模型
+            </a>
+        </div>
+        <div>
+            <a href="javascript:;" class="upload">
+                <input type="file" onchange="getRoleWeapon(this)" ></input>
+                选择武器模型
+            </a>
+            
+        </div>
+    </div>
+    <div class="loadEffect" style="display: none;position: absolute;left: 0;top: 0">
+        <a href="javascript:;" class="upload">
+            <input type="file" onchange="getEffect(this)" ></input>
+            选择特效
+        </a>
+        
+    </div>
+    <script>
+        let files;
+        let type;
+        let inputDiv = document.getElementsByClassName("inputList");
+        function getMovie(data){
+            this.files = data.files;
+            var fileModule = new FileModule.FileOper();
+            this.type = "effect";
+            fileModule.sendFileData(this.files,this.type);
+        }
+        function getRoleMovie(data){
+            this.files = data.files;
+            var fileModule = new FileModule.FileOper();
+            this.type = "role";
+            fileModule.sendFileData(this.files,this.type);
+        }
+        function getRoleWeapon(data){
+            this.files = data.files;
+            var fileModule = new FileModule.FileOper();
+            this.type = "weapon";
+            fileModule.sendFileData(this.files,this.type);
+        }
+        function getEffect(data){
+            this.files = data.files;
+            var fileModule = new FileModule.FileOper();
+            this.type = "edit";
+            fileModule.sendFileData(this.files,this.type);
+        }
+        function getFileData(){
+            return this.files;
+        }
+        function showEdit(){
+            var div = document.getElementsByClassName("loadEffect")[0];
+            div.style.display = "block";
+        }
+        function hideFileLoad(){
+            for(var i = 0;i<inputDiv.length;i++){
+                inputDiv[i].style.display = "none";
+            }
+        }
+        function hideEdit(){
+            var div = document.getElementsByClassName("loadEffect")[0];
+            div.style.display = "none";
+        }
+        function showFileLoad(){
+            for(var i = 0;i<inputDiv.length;i++){
+                inputDiv[i].style.display = "block";
+            }
+        }
+        function saveFile(fileInfo,fileName){
+            // var bb = new Blob([fileInfo],{type:'text/plain;charset=utf-8'});
+            // // bb.append(fileInfo);
+            // saveAs(bb,fileName);
+            var fs = require("fs");
+            fs.writeFile('./output/'+fileName,fileInfo,{flag:'w',encoding:'utf-8',mode:'0666'},function(err){
+                if(err){
+                    alert("文件写入失败")
+                }else{
+                    alert("文件写入成功");
+
+                }
+
+            }) 
+            // saveAs(bb.getBlob('text/plain;charset=utf-8'), 'config.txt');
+        }
+
+        /**
+         * {
+         * "renderMode":, //引擎渲染模式，"canvas" 或者 "webgl"
+         * "audioType": 0 //使用的音频类型，0:默认，1:qq audio，2:web audio，3:audio
+         * "antialias": //WebGL模式下是否开启抗锯齿，true:开启，false:关闭，默认为false
+         * "retina": //是否基于devicePixelRatio缩放画布
+         * }
+         **/
+        egret.runEgret({renderMode:"webgl", audioType:0});
+    </script>
+</body>
+</html>
